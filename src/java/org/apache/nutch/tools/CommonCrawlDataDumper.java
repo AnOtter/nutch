@@ -38,6 +38,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -99,12 +100,12 @@ import com.ibm.icu.text.SimpleDateFormat;
  * the response body truncated for readability. This document must be encoded
  * using CBOR and should be compressed with gzip after encoding. The timestamped
  * URL key for these records' keys follows the same layout as the media file
- * directory structure, with underscores in place of directory separators. </li>
+ * directory structure, with underscores in place of directory separators.
  * </p>
  * <p>
  * Thus, the timestamped url key for the record is provided below followed by an
  * example record:
- * <p/>
+ * </p>
  * <pre>
  * {@code
  * com_somepage_33a3e36bbef59c2a5242c2ccee59239ab30d51f3_1411623696000
@@ -154,13 +155,11 @@ import com.ibm.icu.text.SimpleDateFormat;
  *     }
  *     }
  * </pre>
- * <p/>
  * <p>
  * Upon successful completion the tool displays a very convenient JSON snippet
  * detailing the mimetype classifications and the counts of documents which fall
  * into those classifications. An example is as follows:
  * </p>
- * <p/>
  * <pre>
  * {@code
  * INFO: File Types:
@@ -344,7 +343,8 @@ public class CommonCrawlDataDumper extends Configured implements Tool {
                   .createFileName(md5Ofurl, baseName, extensionName);
               outputFullPath = String.format("%s/%s", fullDir, filename);
 
-              String[] fullPathLevels = fullDir.split(File.separator);
+              String[] fullPathLevels = fullDir
+                  .split(Pattern.quote(File.separator));
               String firstLevelDirName = fullPathLevels[fullPathLevels.length
                   - 2];
               String secondLevelDirName = fullPathLevels[fullPathLevels.length

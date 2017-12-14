@@ -313,13 +313,25 @@
   <description>Value of the "Accept-Language" request header field.
   This allows selecting non-English language as default one to retrieve.
   It is a useful setting for search engines build for certain national group.
+  To send requests without "Accept-Language" header field, thi  property must
+  be configured to contain a space character because an empty property does
+  not overwrite the default.
   </description>
 </property>
 
 <property>
   <name>http.accept</name>
   <value>text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8</value>
-  <description>Value of the "Accept" request header field.
+  <description>Value of the "Accept" request header field. A space character
+  as value will cause that no "Accept" header field is sent in the request.
+  </description>
+</property>
+
+<property>
+  <name>http.accept.charset</name>
+  <value>utf-8,iso-8859-1;q=0.7,*;q=0.7</value>
+  <description>Value of the "Accept-Charset" request header field. A space character
+  as value will cause that no "Accept-Charset" header field is sent in the request.
   </description>
 </property>
 
@@ -522,6 +534,16 @@
   <value>false</value>
   <description>If true, updatedb will add purge records with status DB_GONE
   from the CrawlDB.
+  </description>
+</property>
+
+<property>
+  <name>db.update.purge.orphans</name>
+  <value>false</value>
+  <description>If true, updatedb will permanently delete URL's marked
+  as orphan from the CrawlDb. The plugin scoring-orphan needs to be
+  activated to get records marked as orphan. See the plugin's options
+  elsewhere in this document.
   </description>
 </property>
 
@@ -760,6 +782,30 @@
   <value>-1</value>
   <description>Select only entries with a retry interval lower than
   generate.min.interval. A value of -1 disables this check.</description>
+</property>
+
+<property>
+  <name>generate.hostdb</name>
+  <value></value>
+  <description>Path to HostDB, required for the generate.max.count.expr
+  and generate.fetch.delay.expr properties.
+  See https://issues.apache.org/jira/browse/NUTCH-2368</description>
+</property>
+
+<property>
+  <name>generate.fetch.delay.expr</name>
+  <value></value>
+  <description>Controls variable fetcher.server.delay via a Jexl expression and
+  HostDB information. It allows you to alter fetch delay based on HostDB data.
+  See https://issues.apache.org/jira/browse/NUTCH-2368</description>
+</property>
+
+<property>
+  <name>generate.max.count.expr</name>
+  <value></value>
+  <description>Controls variable generate.max.count via a Jexl expression and
+  HostDB information. It allows you to alter maxCount based on HostDB data.
+  See https://issues.apache.org/jira/browse/NUTCH-2368</description>
 </property>
 
 <!-- urlpartitioner properties -->
@@ -1179,7 +1225,7 @@
 
 <property>
   <name>plugin.includes</name>
-  <value>protocol-http|urlfilter-regex|parse-(html|tika)|index-(basic|anchor)|indexer-solr|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
+  <value>protocol-http|urlfilter-(regex|validator)|parse-(html|tika)|index-(basic|anchor)|indexer-solr|scoring-opic|urlnormalizer-(pass|regex|basic)</value>
   <description>Regular expression naming plugin directory names to
   include.  Any plugin not matching this expression is excluded.
   In any case you need at least include the nutch-extensionpoints plugin. By
@@ -1272,6 +1318,13 @@
 </property>
 
 <property>
+	<name>parser.html.outlinks.htmlnode_metadata_name</name>
+	<value></value>
+	<description>if not empty, the source nodename of a found outlink will
+		be set in the metadata with this name into the outlink</description>
+</property>
+
+<property>
   <name>htmlparsefilter.order</name>
   <value></value>
   <description>The order by which HTMLParse filters are applied.
@@ -1335,6 +1388,13 @@ CAUTION: Set the parser.timeout to -1 or a bigger value than 30, when using this
   property is activated due to extremely high levels of CPU which parsing can sometimes take.  
   </description>
 </property>
+
+<property>
+  <name>parser.store.text</name>
+  <value>true</value>
+  <description>If true (default value), parser will store parse text (parse_text directory within the segment).</description>
+</property>
+
 
 <!--
 <property>
@@ -1492,6 +1552,24 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     </description>
 </property>
 
+<!-- scoring filter orphan properties -->
+
+<property>
+  <name>scoring.orphan.mark.gone.after</name>
+  <value>2592000</value>
+  <description>Time in seconds after which orphaned
+  pages are marked as gone. Default is 30 days.
+  </description>
+</property>
+
+<property>
+  <name>scoring.orphan.mark.orphan.after</name>
+  <value>3456000</value>
+  <description>Time in seconds after which orphaned
+  pages are marked as gone. Default is 40 days.
+  </description>
+</property>
+
 <!-- language-identifier plugin properties -->
 
 <property>
@@ -1527,6 +1605,16 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
   <description>If set to true with lang.extraction.policy containing identify,
   the language code returned by Tika will be assigned to the document ONLY
   if it is deemed certain by Tika.
+  </description>
+</property>
+
+<property>
+  <name>lang.index.languages</name>
+  <value></value>
+  <description>If not empty, should be a comma separated list of language codes.
+  Only documents with one of these language codes will be indexed.
+  "unknown" is a valid language code, will match documents where language
+  detection failed.
   </description>
 </property>
 
@@ -1892,6 +1980,95 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
   <value>600</value>
   <description>Number of seconds allowed for the BulkProcessor to complete its
   last operation.</description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.server.host</name>
+  <value>localhost</value>
+  <description>
+    Host on which the RabbitMQ server is running. Default "localhost".
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.server.port</name>
+  <value>5672</value>
+  <description>
+    Port on which the RabbitMQ server is listening. Default "5672".
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.server.virtualhost</name>
+  <value></value>
+  <description>
+    Virtual Host where the exchange is and the user has access. Default "/".
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.server.username</name>
+  <value>admin</value>
+  <description>
+    Username for RabbitMQ server. Default "admin"
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.server.password</name>
+  <value>admin</value>
+  <description>
+    Password for RabbitMQ server. Default "admin"
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.exchange.server</name>
+  <value></value>
+  <description>
+    Name for the exchange server to use. Default "nutch.exchange"
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.exchange.type</name>
+  <value></value>
+  <description>
+    Type of the exchange. Default "direct".
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.queue.durable</name>
+  <value></value>
+  <description>
+    Message durability into the queue. Default "true".
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.queue.name</name>
+  <value></value>
+  <description>
+    Name of the queue where the messages will be sent. Default "nutch.queue"
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.queue.routingkey</name>
+  <value></value>
+  <description>
+    The routingKey used by indexer to publish messages to specific queues.
+    If the exchange type is "fanout", then this property is ignored. Default is "nutch.key"
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.indexer.commit.size</name>
+  <value>250</value>
+  <description>
+    Amount of documents to send into each message. Default "250"
+  </description>
 </property>
 
 <!--elasticsearch rest properties-->
@@ -2352,6 +2529,7 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     Currently there exists an implemtation for RabbitMQ producer. 
   </description>
 </property>
+
 <property>
   <name>publisher.order</name>
   <value></value>
@@ -2359,7 +2537,9 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     The order in which the publisher queues would be loaded
   </description>
 </property>
+
 <!-- RabbitMQ properties -->
+
 <property>
   <name>rabbitmq.exchange.server</name>
   <value></value>
@@ -2367,6 +2547,7 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     Name for the exchange server to use. Default - "fetcher_log"
   </description>
 </property>
+
 <property>
   <name>rabbitmq.exchange.type</name>
   <value></value>
@@ -2374,6 +2555,7 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     There are a few exchange types available: direct, topic, headers and fanout. Default "fanout".
   </description>
 </property>
+
 <property>
   <name>rabbitmq.host</name>
   <value></value>
@@ -2381,13 +2563,113 @@ visit https://wiki.apache.org/nutch/SimilarityScoringFilter-->
     Host on which the RabbitMQ server is running. Default "localhost".
   </description>
 </property>
+
+<property>
+  <name>rabbitmq.port</name>
+  <value></value>
+  <description>
+    Port on which the RabbitMQ server is listening. Default "5672".
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.virtualhost</name>
+  <value></value>
+  <description>
+    Default 'null'
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.username</name>
+  <value></value>
+  <description>
+    Default 'null'
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.password</name>
+  <value></value>
+  <description>
+    Default 'null'
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.queue.name</name>
+  <value></value>
+  <description>
+    Default 'fanout.queue'
+  </description>
+</property>
+
+<property>
+  <name>rabbitmq.queue.durable</name>
+  <value></value>
+  <description>
+    Default 'true'
+  </description>
+</property>
+
 <property>
   <name>rabbitmq.queue.routingkey</name>
   <value></value>
   <description>
-    The routingKey used by publisher to publish messages to specific queues. If the exchange type is "fanout", then this property is ignored. 
+    Default is 'fanout.key'
+    The routingKey used by publisher to publish messages to specific queues. 
+    If the exchange type is "fanout", then this property is ignored.
   </description>
 </property>
 
+<!-- sitemap properties -->
 
+<property>
+  <name>sitemap.strict.parsing</name>
+  <value>true</value>
+  <description>
+If true (default) the Sitemap parser rejects URLs not sharing the same
+    prefix with the sitemap: a sitemap `http://example.com/catalog/sitemap.xml'
+    may only contain URLs starting with `http://example.com/catalog/'.
+    All other URLs are skipped.  If false the parser will allow any URLs contained
+    in the sitemap.
+  </description>
+</property>
+
+<property>
+  <name>sitemap.url.filter</name>
+  <value>true</value>
+  <description>
+    Filter URLs from sitemaps.
+  </description>
+</property>
+
+<property>
+  <name>sitemap.url.normalize</name>
+  <value>true</value>
+  <description>
+    Normalize URLs from sitemaps.
+   </description>
+</property>
+
+<property>
+  <name>sitemap.url.default.sitemap.xml</name>
+  <value>true</value>
+  <description>
+    Always try &lt;host&gt;/sitemap.xml root even if no sitemap
+    is announced in /robots.txt.
+   </description>
+</property>
+
+<property>
+  <name>sitemap.url.overwrite.existing</name>
+  <value>false</value>
+  <description>
+    If true, the record's existing modified time, interval and score are
+    overwritten by the information in the sitemap. WARNING: overwriting
+    these values may have unexpected effects on what is crawled. Use this
+    only if you can trust the sitemap and if the values in the sitemap do
+    fit with your crawler configuration.
+   </description>
+</property>
 </configuration>
